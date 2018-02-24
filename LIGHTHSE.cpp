@@ -10,129 +10,65 @@
 #include <list>
 #include <vector>
 #include <climits>
-
-//Shortcuts
-#define lli long long int
-#define modulo 1000000007
-#define s(n) scanf("%d",&n)
-#define p(n) printf("%d\n",n)
-#define pl(n) printf("%lld\n",n)
-#define sf(n) scanf("%f",&n)
-#define pf(n) printf("%f\n",n)
-#define sc(n) scanf("%c",&n);
-#define pc(n) printf("%c\n",n)
-#define ss(n) scanf("%s",n)
-#define ps(n) printf("%s\n",n)
-// Useful constants
-#define INF (int)1e9
-#define EPS 1e-9
-// Useful hardware instructions
-#define bitcount __builtin_popcount
-#define gcd __gcd
-// Useful container manipulation / traversal macros
-#define forall(i,a,b) for(int i=a;i<b;i++)
-#define foreach(v,c) for(typeof((c).begin()) v=(c).begin();v!=(c).end();++v)
-#define all(a) a.begin(),a.end()
-#define in(a,b) ((b).find(a)!=(b).end())
-#define pb push_back
-#define fill(a,v) memset(a,v,sizeof a)
-#define sz(a) ((int)(a.size()))
-#define mp make_pair
-// Some common useful functions
-#define MAX(a,b) ((a)>(b)?(a):(b))
-#define MIN(a,b) ((a)<(b)?(a):(b))
-#define checkbit(n,b) ((n>>b)&1)
-#define DREP(a) sort(all(a));a.erase(unique(all(a)),a.end())
-#define INDEX(arr,ind) (lower_bound(all(arr),ind)-arr.begin())
+#include <set>
 
 using namespace std;
+
+typedef pair<int, int> coordinates;
+typedef map<coordinates, int> MPI;
 
 int T;
 
 int main()
 {
-	s(T);
-	while(T--)
-	{
-		//cout<<"TEST :"<<(6-T)<<endl;
-		int n;
-		s(n);
-		int arr[2][n];
-		int max_x,max_y,min_x,max2_y;
-		max_x=max_y=min_x=max2_y=0;
-		forall(i,0,n)
-		{
-			//input x
-			s(arr[0][i]);
-			if(arr[0][max_x]<arr[0][i])
-				max_x=i;
-			if(arr[0][min_x]>arr[0][i])
-				min_x=i;
-			//input y
-			s(arr[1][i]);
-			if(arr[1][max_y]<arr[1][i])
-			{
-				max2_y=max_y;
-				max_y=i;
-			}
-			else if(arr[1][max2_y]<arr[1][i])
-			{
-				max2_y=i;
-			}
-			if(arr[1][max_y]==arr[1][i])
-			{
-				if(arr[0][max_y]<arr[0][i])
-				{
-					if(arr[0][max2_y]>arr[0][max_y])
-						max2_y=max_y;
-					max_y=i;
-				}
-			}
-			if(arr[1][max2_y]==arr[1][i])
-			{
-				if(arr[0][max2_y]>arr[0][i])
-				{
-					max2_y=i;
-				}
-			}
-		}
-		int count=0;
-		if(arr[0][max_y]<=arr[0][min_x])
-		{
-			count=1;
-			cout<<count<<endl<<(max_y+1)<<" SE"<<endl;
-		}
-		else if(arr[0][max_y]>=arr[0][max_x])
-		{
-			count=1;
-			cout<<count<<endl<<(max_y+1)<<" SW"<<endl;
-		}
-		else if(arr[1][max_y]==arr[1][max2_y])
-		{
-			if(arr[0][max2_y]<=arr[0][min_x]){
-				count=1;
-				cout<<count<<endl<<(max2_y+1)<<" SE"<<endl;
-			}
-			else if(arr[0][max2_y]>=arr[0][max_x]){
-				count=1;
-				cout<<count<<endl<<(max2_y+1)<<" SW"<<endl;
-			}
-		}
-		if(arr[0][max_y]>=arr[0][max2_y] && count!=1)
-		{
-			count=2;
-			cout<<count<<endl;
-			cout<<(max_y+1)<<" SW"<<endl;
-			cout<<(max2_y+1)<<" SE"<<endl;
-		}
-		else if(arr[0][max_y]<arr[0][max2_y] && count!=1)
-		{
-
-			count=2;
-			cout<<count<<endl;
-			cout<<(max_y+1)<<" SE"<<endl;
-			cout<<(max2_y+1)<<" SW"<<endl;
-		}
-	}
-	return 0;
+    scanf("%d",&T);
+    while(T--)
+    {
+        int n;
+        scanf("%d",&n);
+        int x, y, xmin, xmax, ymin, ymax;
+        int y_xmin, y_xmax;
+        MPI seen;
+        for(int i=0;i<n;i++){
+            scanf("%d%d",&x,&y);
+            seen[coordinates(x,y)]=i+1;
+            if(i==0){
+                xmin = xmax = x;
+                ymin = y_xmax = y_xmin = y;
+            }
+            else{
+                if(x <= xmin){
+                    if(x == xmin)
+                        y_xmin = min(y_xmin,y);
+                    else
+                        y_xmin = y;
+                    xmin = x;
+                }
+                if(x >=  xmax){
+                    if(x == xmax)
+                        y_xmax = max(y_xmax,y);
+                    else
+                        y_xmax = y;
+                    xmax = x;
+                }
+                ymin = min(y,ymin);
+                ymax = max(y,ymax);
+            }
+        }
+        if (seen[ coordinates(xmin, ymin) ] > 0)  printf("1\n%d NE\n", seen[ coordinates(xmin, ymin) ]);
+        else if (seen[ coordinates(xmin, ymax) ] > 0) printf("1\n%d SE\n", seen[ coordinates(xmin, ymax) ]);
+        else if (seen[ coordinates(xmax, ymax) ] > 0) printf("1\n%d SW\n", seen[ coordinates(xmax, ymax) ]);
+        else if (seen[ coordinates(xmax, ymin) ] > 0) printf("1\n%d NW\n", seen[ coordinates(xmax, ymin) ]);
+        else {
+            printf("2\n");
+            if (y_xmin <= y_xmax) {
+                printf("%d NE\n", seen[ coordinates(xmin, y_xmin) ]);
+                printf("%d SW\n", seen[ coordinates(xmax, y_xmax) ]);
+            } else {
+                printf("%d SE\n", seen[ coordinates(xmin, y_xmin) ]);
+                printf("%d NW\n", seen[ coordinates(xmax, y_xmax) ]);
+            }
+        }
+    }
+    return 0;
 }
